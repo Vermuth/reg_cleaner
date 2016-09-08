@@ -32,7 +32,7 @@ dry_run_output = STDIN.noecho(&:gets)
 array = dry_run_output.split("\n")
 $/ = "\n"
 
-# Begin santizing the data by pulling out only lines with specified repo name
+# Begin sanitizing the data by pulling out only lines with specified repo name
 stdin_array = []
 array.each do |line|
   repos.each do |repo_name|
