@@ -1,11 +1,11 @@
 require 'io/console'
 
-require_relative './config'
+require_relative '../config'
 
 # The purpose of this script is to remove old versions of repositories on docker registries with the latest tag.
 # When you push a new latest, the last latest is untagged and takes up diskspace.
 
-registry_host = ENV.fetch('REGESTRY_HOST')
+registry_host = ENV.fetch('REGISTRY_HOST')
 
 # Get array of repos
 auth = {
