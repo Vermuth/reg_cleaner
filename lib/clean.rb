@@ -32,8 +32,9 @@ $/ = "\n"
 
 # Begin sanitizing the data by pulling out only lines with specified repo name
 repo_stdin_array = []
+
 array.each do |line|
-  repos.each do |repo_name|
+  repos_array.each do |repo_name|
     if line.include?("#{repo_name}: marking manifest")
       repo_stdin_array << [repo_name, line]
     end
@@ -48,16 +49,18 @@ repo_stdin_array.each do |repo_name, manifest|
 end
 
 puts ""
-puts "These are the SHAs of every #{repos.join(', ')} image on the registry"
+puts "These are the SHAs of every #{repos} image on the registry"
 puts ""
 puts repo_name_sha_array
 puts ""
 
 # Find the SHA for the image currently labeled as latest. We want to keep this image
 lates_sha_array = []
-repos.each do |repo_name|
+repos_array.each do |repo_name|
   lates_sha_array << HTTParty.get("https://#{registry_host}/v2/#{repo_name}/manifests/latest", basic_auth: auth, verify: false, headers: {"Accept" => "application/vnd.docker.distribution.manifest.v2+json"}).headers["docker-content-digest"]
 end
+# remove nil
+lates_sha_array = lates_sha_array.compact
 
 # Remove array with latest SHA from the array of report_names and SHA's
 lates_sha_array.each do |latest_sha|
