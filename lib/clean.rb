@@ -54,16 +54,22 @@ puts ""
 puts repo_name_sha_array
 puts ""
 
-# Find the SHA for the image currently labeled as latest. We want to keep this image
-lates_sha_array = []
+# Find the SHA for the image currently labeled as tags. We want to keep this images
+tags_keep_sha_array = []
 repos_array.each do |repo_name|
-  lates_sha_array << HTTParty.get("https://#{registry_host}/v2/#{repo_name}/manifests/latest", basic_auth: auth, verify: false, headers: {"Accept" => "application/vnd.docker.distribution.manifest.v2+json"}).headers["docker-content-digest"]
+  %w(
+    latest
+    master
+    development
+  ).each do |tag|
+    tags_keep_sha_array << HTTParty.get("https://#{registry_host}/v2/#{repo_name}/manifests/#{tag}", basic_auth: auth, verify: false, headers: {"Accept" => "application/vnd.docker.distribution.manifest.v2+json"}).headers["docker-content-digest"]
+  end
 end
 # remove nil
-lates_sha_array = lates_sha_array.compact
+tags_keep_sha_array = tags_keep_sha_array.compact
 
 # Remove array with latest SHA from the array of report_names and SHA's
-lates_sha_array.each do |latest_sha|
+tags_keep_sha_array.each do |latest_sha|
   repo_name_sha_array.each do |repo_sha|
     repo_name_sha_array.delete(repo_sha) if repo_sha.include?(latest_sha)
   end
@@ -90,4 +96,4 @@ end
 puts ""
 puts "The SHA's (and their associated blobs) are now marked for deletion"
 # Garbage Collection runs via cron at 4am
-puts "Garbage Collection is scheduled to run tomorrow at 4am"
+# puts "Garbage Collection is scheduled to run tomorrow at 4am"
